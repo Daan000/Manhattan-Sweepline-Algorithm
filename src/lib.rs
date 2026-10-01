@@ -84,7 +84,7 @@ pub struct SweepLine {
 }
 impl SweepLine {
     fn new() -> Self {
-        SweepLine {
+        Self {
             event_queue: BinaryHeap::new(),
             active_lines: BTreeSet::new(),
             start_x: 0.0,
@@ -93,9 +93,8 @@ impl SweepLine {
     }
 
     pub fn add_line(&mut self, mut line: Line) {
-        if line.start.y != line.end.y {
-            panic!("Lines must be horizontal");
-        }
+        assert_eq!(line.start.y, line.end.y, "Lines must be horizontal");
+
         if line.start > line.end {
             std::mem::swap(&mut line.start, &mut line.end);
         }
@@ -122,8 +121,7 @@ impl SweepLine {
         let max_height = self
             .active_lines
             .last()
-            .map(|line| line.start.y)
-            .unwrap_or(0.0);
+            .map_or(0.0, |line| line.start.y);
 
         let current_x = event.point.x;
         self.result += (current_x - self.start_x) * max_height;
