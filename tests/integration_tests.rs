@@ -1,3 +1,4 @@
+//dankje gemini
 use manhatten;
 #[test]
 fn test_sweep_line_simple() {
@@ -18,7 +19,6 @@ fn test_sweep_line_simple() {
     let res = sweep_line.run();
     assert_eq!(res, 6.0);
 }
-//dankje gemini
 #[test]
 fn test_sweep_line_complex() {
     let mut sweep_line = manhatten::SweepLine::default();
@@ -86,4 +86,98 @@ fn test_sweep_line_complex() {
     // Totaal: 2 + 3 + 10 + 3 + 2 + 6 + 6 + 4 + 2 + 0 + 6 = 44.0
 
     assert_eq!(res, 44.0);
+}
+#[test]
+fn test_sweep_line_reversed_coordinates() {
+    let mut sweep_line = manhatten::SweepLine::default();
+
+    // De x-waarde van start is groter dan end, dit moet intern geswapt worden.
+    sweep_line.add_line(manhatten::Line {
+        id: 1,
+        start: manhatten::Point { x: 6.0, y: 4.0 },
+        end: manhatten::Point { x: 2.0, y: 4.0 },
+    });
+
+    let res = sweep_line.run();
+    // Breedte: 6.0 - 2.0 = 4.0
+    // Hoogte: 4.0
+    // Oppervlakte: 4.0 * 4.0 = 16.0
+    assert_eq!(res, 16.0);
+}
+#[test]
+fn test_sweep_line_identical_lines() {
+    let mut sweep_line = manhatten::SweepLine::default();
+
+    sweep_line.add_line(manhatten::Line {
+        id: 1,
+        start: manhatten::Point { x: 1.0, y: 5.0 },
+        end: manhatten::Point { x: 5.0, y: 5.0 },
+    });
+
+    // Identiek aan lijn 1, met uitzondering van het id
+    sweep_line.add_line(manhatten::Line {
+        id: 2,
+        start: manhatten::Point { x: 1.0, y: 5.0 },
+        end: manhatten::Point { x: 5.0, y: 5.0 },
+    });
+
+    let res = sweep_line.run();
+    // Ze bedekken exact dezelfde ruimte, dus de maximale hoogte blijft 5.0
+    // en de oppervlakte overlapt niet extra.
+    // 4.0 * 5.0 = 20.0
+    assert_eq!(res, 20.0);
+}
+#[test]
+fn test_sweep_line_zero_width() {
+    let mut sweep_line = manhatten::SweepLine::default();
+
+    sweep_line.add_line(manhatten::Line {
+        id: 1,
+        start: manhatten::Point { x: 3.0, y: 10.0 },
+        end: manhatten::Point { x: 3.0, y: 10.0 },
+    });
+
+    sweep_line.add_line(manhatten::Line {
+        id: 2,
+        start: manhatten::Point { x: 5.0, y: 5.0 },
+        end: manhatten::Point { x: 5.0, y: 5.0 },
+    });
+
+    let res = sweep_line.run();
+    // Omdat dx (current_x - start_x) altijd 0 is, moet het resultaat 0 zijn.
+    assert_eq!(res, 0.0);
+}
+#[test]
+fn test_sweep_line_staircase() {
+    let mut sweep_line = manhatten::SweepLine::default();
+
+    // Basis
+    sweep_line.add_line(manhatten::Line {
+        id: 1,
+        start: manhatten::Point { x: 0.0, y: 1.0 },
+        end: manhatten::Point { x: 4.0, y: 1.0 },
+    });
+    // Midden trede
+    sweep_line.add_line(manhatten::Line {
+        id: 2,
+        start: manhatten::Point { x: 1.0, y: 2.0 },
+        end: manhatten::Point { x: 3.0, y: 2.0 },
+    });
+    // Top
+    sweep_line.add_line(manhatten::Line {
+        id: 3,
+        start: manhatten::Point { x: 1.5, y: 3.0 },
+        end: manhatten::Point { x: 2.5, y: 3.0 },
+    });
+
+    let res = sweep_line.run();
+
+    // Oppervlaktes per segment:
+    // [0.0, 1.0]: breedte 1.0 * hoogte 1.0 = 1.0
+    // [1.0, 1.5]: breedte 0.5 * hoogte 2.0 = 1.0
+    // [1.5, 2.5]: breedte 1.0 * hoogte 3.0 = 3.0
+    // [2.5, 3.0]: breedte 0.5 * hoogte 2.0 = 1.0
+    // [3.0, 4.0]: breedte 1.0 * hoogte 1.0 = 1.0
+    // Totaal: 1.0 + 1.0 + 3.0 + 1.0 + 1.0 = 7.0
+    assert_eq!(res, 7.0);
 }

@@ -68,6 +68,7 @@ impl Ord for Event {
     fn cmp(&self, other: &Self) -> Ordering {
         // Draai other en self om zodat het linkste element eerst komt
         other.point.cmp(&self.point)
+            .then_with(|| other.event_type.cmp(&self.event_type))
     }
 }
 
