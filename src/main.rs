@@ -1,4 +1,4 @@
-use manhatten::*;
+use manhattan_sweepline::*;
 fn main() {
     let mut sweep_line = SweepLine::default();
 

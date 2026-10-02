@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "manhatten"
+name = "manhattan_sweepline"
 version = "0.1.0"
