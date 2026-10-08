@@ -84,7 +84,7 @@ pub struct SweepLine {
     result: f64,
 }
 impl SweepLine {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             event_queue: BinaryHeap::new(),
             active_lines: BTreeSet::new(),
@@ -93,8 +93,12 @@ impl SweepLine {
         }
     }
 
+    /// # Panics
+    ///
+    /// Will panic if the line is not horizontal.
     pub fn add_line(&mut self, mut line: Line) {
-        assert_eq!(line.start.y, line.end.y, "Lines must be horizontal");
+
+        assert!((line.start.y - line.end.y).abs() < 1e-6, "Lines must be horizontal");
 
         if line.start > line.end {
             std::mem::swap(&mut line.start, &mut line.end);
